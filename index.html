@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>StudySprint — 집중 공부 도우미</title>
+  <style>
+    :root{
+      --bg:#f7f8fc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e5e7eb;
+      --primary:#2563eb;
+      --primary-soft:#eff6ff;
+      --green:#059669;
+      --red:#dc2626;
+      --amber:#d97706;
+      --shadow:0 16px 40px rgba(15,23,42,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter,Pretendard,"Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 0 0, rgba(37,99,235,.08), transparent 28%),
+        linear-gradient(180deg,#fbfdff 0%,var(--bg) 100%);
+    }
+    button,input,textarea{font:inherit}
+    button{cursor:pointer}
+    .wrap{width:min(1120px,calc(100% - 28px));margin:0 auto;padding-bottom:56px}
+    nav{
+      display:flex;justify-content:space-between;align-items:center;
+      min-height:74px;
+    }
+    .brand{display:flex;gap:10px;align-items:center;font-weight:900;letter-spacing:-.03em}
+    .logo{
+      width:38px;height:38px;border-radius:12px;background:#0f172a;color:white;
+      display:grid;place-items:center;font-weight:900;
+    }
+    .tag{
+      color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;
+      padding:6px 9px;border-radius:999px;font-size:12px;font-weight:800;
+    }
+    .ghost{
+      border:1px solid var(--line);background:white;border-radius:12px;padding:9px 12px;
+      font-weight:800;color:#334155;
+    }
+    .hero{
+      display:grid;grid-template-columns:1.08fr .92fr;gap:24px;align-items:center;
+      padding:34px 0 24px;
+    }
+    .hero h1{
+      font-size:clamp(44px,6vw,72px);line-height:.98;margin:0;letter-spacing:-.055em;
+    }
+    .hero h1 span{color:var(--primary)}
+    .hero p{
+      max-width:640px;color:var(--muted);font-size:17px;line-height:1.7;margin:20px 0 0;
+    }
+    .mini{
+      background:#0f172a;color:white;border-radius:26px;padding:22px;box-shadow:0 20px 50px rgba(15,23,42,.18);
+    }
+    .mini-top{display:flex;justify-content:space-between;color:#cbd5e1;font-size:13px}
+    .mini-time{text-align:center;font-size:64px;font-weight:900;letter-spacing:-.05em;margin:34px 0 24px}
+    .mini-bar{height:8px;background:#1e293b;border-radius:999px;overflow:hidden}
+    .mini-bar > div{height:100%;width:68%;background:#60a5fa}
+    .mini-row{display:flex;justify-content:space-between;margin-top:14px;color:#94a3b8;font-size:12px}
+
+    .grid{
+      display:grid;grid-template-columns:1.05fr .95fr;gap:22px;margin-top:20px;
+    }
+    .card{
+      background:rgba(255,255,255,.95);border:1px solid rgba(229,231,235,.9);
+      border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;
+    }
+    .card h2{margin:0;font-size:20px;letter-spacing:-.03em}
+    .sub{color:var(--muted);font-size:13px;line-height:1.5;margin-top:6px}
+    .timer-panel{text-align:center}
+    .mode-row{display:flex;justify-content:center;gap:8px;margin:20px 0 10px;flex-wrap:wrap}
+    .mode-btn{
+      border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;
+      font-size:13px;font-weight:800;color:#475569;
+    }
+    .mode-btn.active{background:#0f172a;color:white;border-color:#0f172a}
+    .time{
+      font-size:clamp(64px,11vw,100px);font-weight:900;letter-spacing:-.06em;margin:20px 0 8px;
+    }
+    .timer-label{color:var(--muted);font-size:13px}
+    .timer-actions{display:flex;justify-content:center;gap:10px;margin-top:22px;flex-wrap:wrap}
+    .primary{
+      border:0;background:var(--primary);color:white;border-radius:13px;padding:12px 18px;
+      font-weight:900;box-shadow:0 10px 22px rgba(37,99,235,.2)
+    }
+    .secondary{
+      border:1px solid var(--line);background:white;color:#334155;border-radius:13px;padding:12px 16px;font-weight:900;
+    }
+    .progress{
+      margin-top:22px;height:10px;background:#edf2f7;border-radius:999px;overflow:hidden;
+    }
+    .progress > div{height:100%;width:0%;background:var(--primary);transition:width .3s}
+    .session-stats{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;
+    }
+    .stat{
+      background:#f8fafc;border:1px solid var(--line);border-radius:15px;padding:13px;
+      text-align:left;
+    }
+    .stat span{display:block;color:var(--muted);font-size:12px}
+    .stat strong{display:block;margin-top:4px;font-size:21px}
+    .head{
+      display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;
+    }
+    .input-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+    .input-row input{
+      width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;outline:none;
+    }
+    .input-row input:focus{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(37,99,235,.08)}
+    .task-list{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+    .task{
+      display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;
+      border:1px solid var(--line);border-radius:14px;padding:12px;background:white;
+    }
+    .task.done{opacity:.58}
+    .task.done .task-text{text-decoration:line-through}
+    .task-check{
+      appearance:none;width:20px;height:20px;border:2px solid #cbd5e1;border-radius:6px;margin-top:1px;position:relative
+    }
+    .task-check:checked{background:var(--primary);border-color:var(--primary)}
+    .task-check:checked:after{content:"✓";position:absolute;color:white;font-size:13px;left:3px;top:-1px;font-weight:900}
+    .task-text{font-weight:800;font-size:14px;line-height:1.45}
+    .task-meta{color:var(--muted);font-size:11px;margin-top:4px}
+    .delete{
+      border:0;background:transparent;color:#94a3b8;font-size:18px;line-height:1;padding:2px 4px
+    }
+    .empty{
+      border:1px dashed #cbd5e1;background:#f8fafc;border-radius:14px;padding:24px;text-align:center;color:#64748b;font-size:13px
+    }
+    textarea{
+      width:100%;min-height:160px;resize:vertical;border:1px solid var(--line);border-radius:14px;padding:14px;outline:none;line-height:1.6;
+    }
+    textarea:focus{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(37,99,235,.08)}
+    .insights{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .insight{
+      border:1px solid var(--line);background:#f8fafc;border-radius:16px;padding:16px;
+    }
+    .insight span{font-size:12px;color:var(--muted)}
+    .insight strong{font-size:26px;display:block;margin-top:4px}
+    .week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:16px}
+    .day{
+      background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center
+    }
+    .day b{display:block;font-size:12px}
+    .day small{color:var(--muted);font-size:10px}
+    .day.today{border-color:#93c5fd;background:#eff6ff}
+    .footer{text-align:center;color:#94a3b8;font-size:12px;padding-top:34px}
+    .toast{
+      position:fixed;left:50%;bottom:22px;transform:translate(-50%,18px);opacity:0;
+      background:#0f172a;color:white;border-radius:12px;padding:10px 14px;font-size:13px;transition:.2s;pointer-events:none;
+      box-shadow:0 10px 30px rgba(15,23,42,.25)
+    }
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:900px){
+      .hero,.grid{grid-template-columns:1fr}
+    }
+    @media(max-width:600px){
+      .wrap{width:min(100% - 18px,1120px)}
+      .hero{padding-top:10px}
+      .hero h1{font-size:46px}
+      .card{padding:16px;border-radius:18px}
+      .session-stats{grid-template-columns:1fr 1fr 1fr}
+      .insights{grid-template-columns:1fr 1fr}
+      .week{gap:5px}
+      .day{padding:8px 2px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav>
+      <div class="brand">
+        <div class="logo">S</div>
+        <span>StudySprint</span>
+        <span class="tag">Portfolio Project</span>
+      </div>
+      <button class="ghost" id="resetData">데이터 초기화</button>
+    </nav>
+
+    <section class="hero">
+      <div>
+        <h1>오늘 공부를<br><span>짧고 선명하게.</span></h1>
+        <p>
+          집중 타이머, 오늘 할 일, 간단한 공부 기록을 한 화면에서 관리하는 미니 생산성 웹앱입니다.
+          로그인 없이 바로 쓰고, 기록은 브라우저에 저장됩니다.
+        </p>
+      </div>
+      <div class="mini">
+        <div class="mini-top">
+          <span>FOCUS SESSION</span><span>오늘 3회</span>
+        </div>
+        <div class="mini-time">24:18</div>
+        <div class="mini-bar"><div></div></div>
+        <div class="mini-row"><span>집중 중</span><span>68%</span></div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card timer-panel">
+        <h2>집중 타이머</h2>
+        <div class="sub">Pomodoro 방식으로 집중과 휴식을 반복할 수 있습니다.</div>
+
+        <div class="mode-row">
+          <button class="mode-btn active" data-min="25" data-label="집중">집중 25분</button>
+          <button class="mode-btn" data-min="5" data-label="짧은 휴식">휴식 5분</button>
+          <button class="mode-btn" data-min="15" data-label="긴 휴식">긴 휴식 15분</button>
+        </div>
+
+        <div class="time" id="timeDisplay">25:00</div>
+        <div class="timer-label" id="timerLabel">집중 세션</div>
+        <div class="progress"><div id="progressBar"></div></div>
+
+        <div class="timer-actions">
+          <button class="primary" id="startPause">시작</button>
+          <button class="secondary" id="resetTimer">리셋</button>
+          <button class="secondary" id="finishSession">세션 완료</button>
+        </div>
+
+        <div class="session-stats">
+          <div class="stat"><span>오늘 집중</span><strong id="todayMinutes">0분</strong></div>
+          <div class="stat"><span>완료 세션</span><strong id="todaySessions">0회</strong></div>
+          <div class="stat"><span>완료 할 일</span><strong id="doneTasks">0개</strong></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="head">
+          <div>
+            <h2>오늘 할 일</h2>
+            <div class="sub">작게 쪼개서 하나씩 끝내세요.</div>
+          </div>
+          <span class="tag" id="taskProgressText">0 / 0</span>
+        </div>
+
+        <div class="input-row">
+          <input id="taskInput" placeholder="예: 확률론 과제 3번까지" />
+          <button class="primary" id="addTask">추가</button>
+        </div>
+
+        <div class="task-list" id="taskList">
+          <div class="empty">오늘 할 일을 추가해 보세요.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="head">
+          <div>
+            <h2>오늘 메모</h2>
+            <div class="sub">공부하면서 떠오른 내용이나 내일 할 일을 간단히 적어두세요.</div>
+          </div>
+        </div>
+        <textarea id="memo" placeholder="예: 통계 4장 복습 필요 / 내일 C 과제 제출"></textarea>
+      </div>
+
+      <div class="card">
+        <div class="head">
+          <div>
+            <h2>이번 주 기록</h2>
+            <div class="sub">집중 세션을 완료하면 자동으로 누적됩니다.</div>
+          </div>
+        </div>
+
+        <div class="insights">
+          <div class="insight">
+            <span>이번 주 집중</span>
+            <strong id="weekMinutes">0분</strong>
+          </div>
+          <div class="insight">
+            <span>이번 주 세션</span>
+            <strong id="weekSessions">0회</strong>
+          </div>
+        </div>
+
+        <div class="week" id="weekGrid"></div>
+      </div>
+    </section>
+
+    <div class="footer">
+      StudySprint · Vanilla HTML/CSS/JavaScript · localStorage 기반
+    </div>
+  </div>
+
+  <div class="toast" id="toast">완료</div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const KEY = "studysprint-v1";
+
+    const todayKey = () => {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    };
+
+    let state = {
+      tasks: [],
+      memo: "",
+      history: {}
+    };
+
+    let timer = {
+      total: 25 * 60,
+      remaining: 25 * 60,
+      running: false,
+      interval: null,
+      label: "집중"
+    };
+
+    function save(){
+      localStorage.setItem(KEY, JSON.stringify(state));
+    }
+
+    function load(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(KEY));
+        if(saved) state = {...state, ...saved};
+      }catch(e){}
+      $("#memo").value = state.memo || "";
+      renderTasks();
+      renderStats();
+      renderWeek();
+    }
+
+    function toast(msg){
+      const el = $("#toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      setTimeout(()=>el.classList.remove("show"),1400);
+    }
+
+    function formatTime(sec){
+      const m = Math.floor(sec/60);
+      const s = sec%60;
+      return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
+
+    function renderTimer(){
+      $("#timeDisplay").textContent = formatTime(timer.remaining);
+      $("#timerLabel").textContent = timer.label === "집중" ? "집중 세션" : timer.label;
+      const pct = timer.total ? ((timer.total - timer.remaining) / timer.total) * 100 : 0;
+      $("#progressBar").style.width = `${Math.max(0,Math.min(100,pct))}%`;
+      $("#startPause").textContent = timer.running ? "일시정지" : "시작";
+      document.title = timer.running ? `${formatTime(timer.remaining)} · StudySprint` : "StudySprint — 집중 공부 도우미";
+    }
+
+    function stopTimer(){
+      timer.running = false;
+      clearInterval(timer.interval);
+      timer.interval = null;
+      renderTimer();
+    }
+
+    function startPause(){
+      if(timer.running){
+        stopTimer();
+        return;
+      }
+      timer.running = true;
+      renderTimer();
+      timer.interval = setInterval(()=>{
+        timer.remaining--;
+        if(timer.remaining <= 0){
+          timer.remaining = 0;
+          stopTimer();
+          if(timer.label === "집중") completeFocus(timer.total/60);
+          toast("세션이 끝났습니다.");
+        }
+        renderTimer();
+      },1000);
+    }
+
+    function setMode(min,label,button){
+      stopTimer();
+      timer.total = min*60;
+      timer.remaining = timer.total;
+      timer.label = label;
+      document.querySelectorAll(".mode-btn").forEach(b=>b.classList.remove("active"));
+      button.classList.add("active");
+      renderTimer();
+    }
+
+    function completeFocus(minutes){
+      const key = todayKey();
+      if(!state.history[key]) state.history[key] = {minutes:0,sessions:0};
+      state.history[key].minutes += Math.round(minutes);
+      state.history[key].sessions += 1;
+      save();
+      renderStats();
+      renderWeek();
+    }
+
+    function finishSession(){
+      if(timer.label !== "집중"){
+        toast("집중 세션에서만 기록됩니다.");
+        return;
+      }
+      const elapsed = timer.total - timer.remaining;
+      if(elapsed < 60){
+        toast("1분 이상 진행한 뒤 기록해 주세요.");
+        return;
+      }
+      completeFocus(elapsed/60);
+      stopTimer();
+      timer.remaining = timer.total;
+      renderTimer();
+      toast("집중 시간을 기록했습니다.");
+    }
+
+    function addTask(){
+      const input = $("#taskInput");
+      const text = input.value.trim();
+      if(!text) return;
+      state.tasks.push({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()),
+        text,
+        done:false,
+        created:Date.now()
+      });
+      input.value = "";
+      save();
+      renderTasks();
+    }
+
+    function deleteTask(id){
+      state.tasks = state.tasks.filter(t=>t.id!==id);
+      save();
+      renderTasks();
+    }
+
+    function renderTasks(){
+      const list = $("#taskList");
+      if(!state.tasks.length){
+        list.innerHTML = `<div class="empty">오늘 할 일을 추가해 보세요.</div>`;
+      }else{
+        list.innerHTML = state.tasks.map(t=>`
+          <div class="task ${t.done ? "done" : ""}">
+            <input class="task-check" type="checkbox" data-id="${t.id}" ${t.done ? "checked" : ""}>
+            <div>
+              <div class="task-text">${escapeHtml(t.text)}</div>
+              <div class="task-meta">${t.done ? "완료" : "진행 전"}</div>
+            </div>
+            <button class="delete" data-del="${t.id}" aria-label="삭제">×</button>
+          </div>
+        `).join("");
+      }
+
+      document.querySelectorAll(".task-check").forEach(el=>{
+        el.addEventListener("change",e=>{
+          const t = state.tasks.find(x=>x.id===e.target.dataset.id);
+          if(t) t.done = e.target.checked;
+          save();
+          renderTasks();
+          renderStats();
+        });
+      });
+
+      document.querySelectorAll("[data-del]").forEach(el=>{
+        el.addEventListener("click",()=>deleteTask(el.dataset.del));
+      });
+
+      const done = state.tasks.filter(t=>t.done).length;
+      $("#taskProgressText").textContent = `${done} / ${state.tasks.length}`;
+      $("#doneTasks").textContent = `${done}개`;
+    }
+
+    function renderStats(){
+      const today = state.history[todayKey()] || {minutes:0,sessions:0};
+      $("#todayMinutes").textContent = `${today.minutes}분`;
+      $("#todaySessions").textContent = `${today.sessions}회`;
+
+      const weekDates = getWeekDates();
+      let wm=0, ws=0;
+      weekDates.forEach(d=>{
+        const rec = state.history[d.key] || {minutes:0,sessions:0};
+        wm += rec.minutes;
+        ws += rec.sessions;
+      });
+      $("#weekMinutes").textContent = `${wm}분`;
+      $("#weekSessions").textContent = `${ws}회`;
+      $("#doneTasks").textContent = `${state.tasks.filter(t=>t.done).length}개`;
+    }
+
+    function getWeekDates(){
+      const now = new Date();
+      const day = now.getDay();
+      const diffToMon = (day+6)%7;
+      const monday = new Date(now);
+      monday.setHours(0,0,0,0);
+      monday.setDate(now.getDate()-diffToMon);
+
+      const labels = ["월","화","수","목","금","토","일"];
+      return labels.map((label,i)=>{
+        const d = new Date(monday);
+        d.setDate(monday.getDate()+i);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+        return {label,key,date:d.getDate(),today:key===todayKey()};
+      });
+    }
+
+    function renderWeek(){
+      const grid = $("#weekGrid");
+      grid.innerHTML = getWeekDates().map(d=>{
+        const rec = state.history[d.key] || {minutes:0,sessions:0};
+        return `
+          <div class="day ${d.today ? "today" : ""}">
+            <b>${d.label}</b>
+            <small>${d.date}일</small>
+            <div style="margin-top:7px;font-weight:900;font-size:12px">${rec.minutes}m</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(v){
+      return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+    }
+
+    $(".mode-row").addEventListener("click",e=>{
+      const b = e.target.closest(".mode-btn");
+      if(!b) return;
+      setMode(Number(b.dataset.min),b.dataset.label,b);
+    });
+
+    $("#startPause").addEventListener("click",startPause);
+    $("#resetTimer").addEventListener("click",()=>{
+      stopTimer();
+      timer.remaining = timer.total;
+      renderTimer();
+    });
+    $("#finishSession").addEventListener("click",finishSession);
+
+    $("#addTask").addEventListener("click",addTask);
+    $("#taskInput").addEventListener("keydown",e=>{
+      if(e.key==="Enter") addTask();
+    });
+
+    $("#memo").addEventListener("input",e=>{
+      state.memo = e.target.value;
+      save();
+    });
+
+    $("#resetData").addEventListener("click",()=>{
+      if(confirm("저장된 공부 기록과 할 일을 모두 지울까요?")){
+        state = {tasks:[],memo:"",history:{}};
+        $("#memo").value = "";
+        localStorage.removeItem(KEY);
+        renderTasks();
+        renderStats();
+        renderWeek();
+        toast("데이터를 초기화했습니다.");
+      }
+    });
+
+    load();
+    renderTimer();
+  </script>
+</body>
+</html>
